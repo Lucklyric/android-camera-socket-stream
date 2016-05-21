@@ -1,12 +1,20 @@
 package com.example.alvin.cameraclient;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Camera;
+import android.media.FaceDetector;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +29,14 @@ public class MainActivity extends AppCompatActivity {
     public MyClientThread mClient;
     public Bitmap mLastFrame;
 
+    private int face_count;
     private final Handler handler = new MyHandler(this);
+
+    private FaceDetector mFaceDetector = new FaceDetector(320,240,10);
+    private FaceDetector.Face[] faces = new FaceDetector.Face[10];
+    private PointF tmp_point = new PointF();
+    private Paint tmp_paint = new Paint();
+
 
     private Runnable mStatusChecker = new Runnable() {
         @Override
@@ -30,7 +45,25 @@ public class MainActivity extends AppCompatActivity {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mCameraView.setImageBitmap(mLastFrame);
+                        if (mLastFrame!=null){
+
+                            Bitmap mutableBitmap = mLastFrame.copy(Bitmap.Config.RGB_565, true);
+                            face_count = mFaceDetector.findFaces(mLastFrame, faces);
+                            Log.d("Face_Detection", "Face Count: " + String.valueOf(face_count));
+                            Canvas canvas = new Canvas(mutableBitmap);
+
+                            for (int i = 0; i < face_count; i++) {
+                                FaceDetector.Face face = faces[i];
+                                tmp_paint.setColor(Color.RED);
+                                tmp_paint.setAlpha(100);
+                                face.getMidPoint(tmp_point);
+                                canvas.drawCircle(tmp_point.x, tmp_point.y, face.eyesDistance(),
+                                        tmp_paint);
+                            }
+
+                            mCameraView.setImageBitmap(mutableBitmap);
+                        }
+
                     }
                 }); //this function can change value of mInterval.
             } finally {

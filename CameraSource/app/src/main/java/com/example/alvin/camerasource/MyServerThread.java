@@ -5,10 +5,12 @@ import android.os.Handler;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -50,11 +52,13 @@ public class MyServerThread implements Runnable {
 
     public class ServerSocketThread implements Runnable{
         Socket s = null;
-        BufferedReader br = null;
+       // BufferedReader br = null;
+        //BufferedWriter bw = null;
         OutputStream os = null;
         public ServerSocketThread(Socket s) throws IOException {
             this.s = s;
-            br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            //br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            //bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
         }
         @Override
         public void run() {

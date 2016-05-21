@@ -1,8 +1,11 @@
 package com.example.alvin.cameraclient;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.FaceDetector;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -16,10 +19,15 @@ public class MyClientThread implements Runnable {
     private Socket mSocket;
     private Handler mHandler;
     private Boolean mRunFlag = true;
+    final private String TAG = "MyClientThread";
+    private BitmapFactory.Options bitmap_options = new BitmapFactory.Options();
+
+
 
     public MyClientThread(Socket socket, Handler handler) throws IOException {
         this.mSocket = socket;
         this.mHandler = handler;
+        bitmap_options.inPreferredConfig = Bitmap.Config.RGB_565;
         //br = new BufferedReader(new InputStreamReader(s.getInputStream()));
     }
 
@@ -47,13 +55,15 @@ public class MyClientThread implements Runnable {
                                 len += is.read(buffer, len, imgLength - len);
                             }
                             Message m = mHandler.obtainMessage();
-                            m.obj = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+                            m.obj = BitmapFactory.decodeByteArray(buffer, 0, buffer.length,bitmap_options);
                             if (m.obj != null) {
                                 mHandler.sendMessage(m);
                             } else {
                                 System.out.println("Decode Failed");
                             }
                         }
+                    }else{
+                        Log.d(TAG,"Skip Dirty bytes!!!!");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
