@@ -43,7 +43,8 @@ public class MyClientThread implements Runnable {
             DataInputStream is = new DataInputStream(inStream);
             while (mRunFlag) {
                 try {
-                    if (is.readInt() == 4) {
+                    int token = is.readInt();
+                    if (token == 4) {
                         if (is.readUTF().equals("#@@#")) {
                             //System.out.println("before-token" + token);
                             int imgLength = is.readInt();
@@ -63,7 +64,7 @@ public class MyClientThread implements Runnable {
                             }
                         }
                     }else{
-                        Log.d(TAG,"Skip Dirty bytes!!!!");
+                        Log.d(TAG,"Skip Dirty bytes!!!!"+Integer.toString(token));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
